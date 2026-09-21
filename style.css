@@ -192,3 +192,51 @@ header {
     border: 1px solid #9e3e3e;
     border-radius: 6px;
 }
+/* ============================
+   スマホ版（幅480px以下）
+============================ */
+@media (max-width: 480px) {
+
+    /* 個別枠の余白調整 */
+    .individual {
+        padding: 12px;
+        margin: 15px;
+    }
+
+    /* 名前＋削除ボタンをスマホ向けに */
+    .top-row {
+        gap: 6px;
+    }
+
+    .name-input {
+        width: 100%;   /* ← スマホでは全幅にする */
+        font-size: 15px;
+    }
+
+    .delete-btn {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+
+    /* 曜日とチェックの幅をスマホ向けに縮める */
+    .days span,
+    .checks select {
+        width: 45px;   /* ← スマホ用の最適幅 */
+        padding: 6px;
+        font-size: 14px;
+    }
+
+    /* gap を少し縮める */
+    .days,
+    .checks {
+        gap: 5px;
+    }
+
+    /* モーダルボタンのサイズ調整 */
+    #modalOkBtn,
+    #modalCancelBtn {
+        padding: 12px;
+        font-size: 16px;
+        min-width: 100px;
+    }
+}
