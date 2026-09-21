@@ -65,17 +65,6 @@ modalCancel.onclick = () => {
     modal.style.display = "none";
 };
 
-// 削除ボタン（イベント委譲）
-document.addEventListener("click", (e) => {
-    if (e.target.classList.contains("delete-btn")) {
-
-        const targetBox = e.target.closest(".individual");
-
-        if (confirm("削除しますか？")) {
-            targetBox.remove();
-        }
-    }
-});
 document.addEventListener("change", function(e) {
     if (e.target.tagName === "SELECT") {
         const val = e.target.value;
@@ -88,4 +77,32 @@ document.addEventListener("change", function(e) {
             e.target.style.color = "black";
         }
     }
+});
+let deleteTarget = null; // 削除する枠を一時保存
+
+document.getElementById("printBtn").onclick = () => {
+    window.print();
+};
+
+// 削除ボタンを押したとき
+document.addEventListener("click", (e) => {
+    if (e.target.classList.contains("delete-btn")) {
+        deleteTarget = e.target.closest(".individual");
+        document.getElementById("deleteModal").style.display = "block";
+    }
+});
+
+// 「はい」→ 削除
+document.getElementById("deleteOkBtn").addEventListener("click", () => {
+    if (deleteTarget) {
+        deleteTarget.remove();
+        deleteTarget = null;
+    }
+    document.getElementById("deleteModal").style.display = "none";
+});
+
+// 「いいえ」→ 閉じる
+document.getElementById("deleteCancelBtn").addEventListener("click", () => {
+    deleteTarget = null;
+    document.getElementById("deleteModal").style.display = "none";
 });
