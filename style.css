@@ -20,7 +20,7 @@ header {
     color: #9e3e3e;
     border: 2px solid #9e3e3e;
     padding: 10px 16px;
-    font-size: 16px;
+    font-size: 150px;
     border-radius: 8px;
     cursor: pointer;
     z-index: 50;
@@ -191,7 +191,16 @@ header {
     padding: 6px;
     border: 1px solid #9e3e3e;
     border-radius: 6px;
+    font-size: 60px;
 }
+.shift-table select {
+    color: inherit;
+}
+
+.maru { color: red; }
+.batu { color: #0088ff; }
+.mitei { color: black; }
+
 /* ============================
    スマホ版（幅480px以下）
 ============================ */
@@ -199,45 +208,45 @@ header {
 
     /* 全体の文字を大きく */
     body {
-        font-size: 20px;
+        font-size: 40px;
     }
 
     /* 名前欄 */
     .name-input {
-        font-size: 20px;
+        font-size: 40px;
         padding: 14px;
         width: 100%;
     }
 
     /* 削除ボタン */
     .delete-btn {
-        font-size: 18px;
+        font-size: 36px;
         padding: 14px 18px;
     }
 
     /* 曜日 */
     .days span {
-        font-size: 18px;
+        font-size: 36px;
         padding: 12px;
         width: 60px;
     }
 
     /* チェックボックス */
     .checks select {
-        font-size: 18px;
+        font-size: 36px;
         padding: 12px;
         width: 60px;
     }
 
     /* モーダルの文字 */
     #modalNameInput {
-        font-size: 20px;
+        font-size: 40px;
         padding: 16px;
     }
 
     #modalOkBtn,
     #modalCancelBtn {
-        font-size: 20px;
+        font-size: 40px;
         padding: 16px;
         min-width: 130px;
     }
