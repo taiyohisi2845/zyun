@@ -1,368 +1,53 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>シフト管理</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="script.js" defer></script>
+    <meta charset="UTF-8">
+    <title>シフト管理</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
 </head>
 <body>
-  <header class="site-header" role="banner">
-    <div class="header-left header-actions">
-      <button id="printBtn" class="btn print-btn" type="button" aria-label="印刷">印刷</button>
-      <button id="restoreBtn" class="btn restore-open-btn" type="button" aria-haspopup="dialog" aria-controls="restoreModal" aria-label="復元">復元</button>
-    </div>
+    <header>
+        <button id="printBtn" class="print-btn">印刷</button>
+        <button id="restoreBtn" class="print-btn" style="top: 100px;">復元</button>
 
-    <h1 class="site-title">シフト管理</h1>
+        <h1>シフト管理</h1>
+        <button id="addPersonBtn" class="add-btn">追加</button>
+    </header>
 
-    <div class="header-right header-add">
-      <button id="addPersonBtn" class="btn add-btn" type="button" aria-haspopup="dialog" aria-controls="nameModal" aria-label="追加">追加</button>
-    </div>
-  </header>
-
-  <main id="main" role="main">
-    <!-- 名前入力モーダル -->
-    <div id="nameModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="nameModalTitle" hidden>
-      <div class="modal-content" role="document">
-        <h2 id="nameModalTitle">名前を入力してください</h2>
-        <label for="modalNameInput" class="visually-hidden">名前</label>
-        <input id="modalNameInput" name="personName" type="text" placeholder="名前" autocomplete="name" />
-        <div class="modal-actions">
-          <button id="modalOkBtn" class="btn" type="button">OK</button>
-          <button id="modalCancelBtn" class="btn" type="button">キャンセル</button>
+    <!-- 名前入力ポップアップ -->
+    <div id="nameModal" class="modal">
+        <div class="modal-content">
+            <h3>名前を入力してください</h3>
+            <input type="text" id="modalNameInput" placeholder="名前">
+            <button id="modalOkBtn">OK</button>
+            <button id="modalCancelBtn">キャンセル</button>
         </div>
-      </div>
     </div>
+
+    <!-- ★ 初期の1人分は削除済み ★ -->
+
+    <!-- 追加された人を入れる場所 -->
+    <div id="personContainer"></div>
 
     <!-- 削除確認モーダル -->
-    <div id="deleteModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle" hidden>
-      <div class="modal-content" role="document">
-        <h2 id="deleteModalTitle">削除しますか</h2>
-        <p class="modal-message">この人を削除してもよろしいですか？</p>
-        <div class="modal-actions">
-          <button id="deleteOkBtn" class="btn danger" type="button">はい</button>
-          <button id="deleteCancelBtn" class="btn" type="button">いいえ</button>
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <p style="font-size: 24px; margin-bottom: 20px;">削除しますか？</p>
+            <button id="deleteOkBtn">はい</button>
+            <button id="deleteCancelBtn">いいえ</button>
         </div>
-      </div>
     </div>
 
     <!-- 復元モーダル -->
-    <div id="restoreModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="restoreModalTitle" hidden>
-      <div class="modal-content" role="document">
-        <h2 id="restoreModalTitle">データ復元</h2>
-        <p class="modal-message">保存済みデータのコピーや貼り付けを行います</p>
-        <div class="modal-actions">
-          <button id="copyDataBtn" class="btn restore-btn" type="button">コピー</button>
-          <button id="pasteDataBtn" class="btn restore-btn" type="button">貼り付け</button>
-          <button id="restoreCancelBtn" class="btn restore-cancel-btn" type="button">閉じる</button>
+    <div id="restoreModal" class="modal">
+        <div class="modal-content">
+            <p style="font-size: 28px; margin-bottom: 20px;">データ復元</p>
+            <button id="copyDataBtn" class="restore-btn">コピー</button>
+            <button id="pasteDataBtn" class="restore-btn">貼り付け</button>
+            <button id="restoreCancelBtn" class="restore-cancel-btn">閉じる</button>
         </div>
-      </div>
     </div>
 
-    <!-- 登録者一覧セクション -->
-    <section id="personSection" aria-labelledby="personSectionTitle">
-      <h2 id="personSectionTitle" class="visually-hidden">登録者一覧</h2>
-      <div id="personContainer" class="person-container" aria-live="polite"></div>
-    </section>
-  </main>
-
-  <!-- テンプレート: 個別カード -->
-  <template id="personTemplate">
-    <article class="individual" role="article">
-      <header class="top-row person-header">
-        <input type="text" class="name-input" value="" aria-label="名前" />
-        <div class="person-controls">
-          <button class="delete-btn btn" type="button" aria-label="削除">削除</button>
-        </div>
-      </header>
-
-      <table class="shift-table" role="table" aria-label="シフト">
-        <thead>
-          <tr>
-            <th scope="col">月</th>
-            <th scope="col">火</th>
-            <th scope="col">水</th>
-            <th scope="col">木</th>
-            <th scope="col">金</th>
-            <th scope="col">土</th>
-            <th scope="col">日</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <!-- 7日分のセル -->
-            <!-- テンプレート内の1セル（縦並び） -->
-            <td>
-                <div class="cell-wrap column">
-                    <select class="check-select" aria-label="出勤状態">
-                    <option value="ー">ー</option>
-                    <option value="〇">〇</option>
-                    <option value="✕">✕</option>
-                    </select>
-
-                    <select class="time-select start" aria-label="開始時刻">
-                    <option value="">--</option>
-                    <option>09:00</option><option>09:30</option><option>10:00</option>
-                    <option>10:30</option><option>11:00</option><option>11:30</option>
-                    <option>12:00</option><option>12:30</option><option>13:00</option>
-                    <option>13:30</option><option>14:00</option><option>14:30</option>
-                    <option>15:00</option><option>15:30</option><option>16:00</option>
-                    <option>16:30</option><option>17:00</option><option>17:30</option>
-                    <option>18:00</option><option>18:30</option><option>19:00</option>
-                    <option>19:30</option><option>20:00</option>
-                    </select>
-
-                    <span class="tilde" aria-hidden="true">｜</span>
-
-                    <select class="time-select end" aria-label="終了時刻">
-                    <option value="">--</option>
-                    <option>12:00</option><option>12:30</option><option>13:00</option>
-                    <option>13:30</option><option>14:00</option><option>14:30</option>
-                    <option>15:00</option><option>15:30</option><option>16:00</option>
-                    <option>16:30</option><option>17:00</option><option>17:30</option>
-                    <option>18:00</option><option>18:30</option><option>19:00</option>
-                    <option>19:30</option><option>20:00</option><option>20:30</option>
-                    <option>21:00</option><option>21:30</option><option>22:00</option>
-                    </select>
-                </div>
-            </td>
-
-            <!-- テンプレート内の1セル（縦並び） -->
-            <td>
-                <div class="cell-wrap column">
-                    <select class="check-select" aria-label="出勤状態">
-                    <option value="ー">ー</option>
-                    <option value="〇">〇</option>
-                    <option value="✕">✕</option>
-                    </select>
-
-                    <select class="time-select start" aria-label="開始時刻">
-                    <option value="">--</option>
-                    <option>09:00</option><option>09:30</option><option>10:00</option>
-                    <option>10:30</option><option>11:00</option><option>11:30</option>
-                    <option>12:00</option><option>12:30</option><option>13:00</option>
-                    <option>13:30</option><option>14:00</option><option>14:30</option>
-                    <option>15:00</option><option>15:30</option><option>16:00</option>
-                    <option>16:30</option><option>17:00</option><option>17:30</option>
-                    <option>18:00</option><option>18:30</option><option>19:00</option>
-                    <option>19:30</option><option>20:00</option>
-                    </select>
-
-                    <span class="tilde" aria-hidden="true">｜</span>
-
-                    <select class="time-select end" aria-label="終了時刻">
-                    <option value="">--</option>
-                    <option>12:00</option><option>12:30</option><option>13:00</option>
-                    <option>13:30</option><option>14:00</option><option>14:30</option>
-                    <option>15:00</option><option>15:30</option><option>16:00</option>
-                    <option>16:30</option><option>17:00</option><option>17:30</option>
-                    <option>18:00</option><option>18:30</option><option>19:00</option>
-                    <option>19:30</option><option>20:00</option><option>20:30</option>
-                    <option>21:00</option><option>21:30</option><option>22:00</option>
-                    </select>
-                </div>
-            </td>
-
-            <!-- テンプレート内の1セル（縦並び） -->
-            <td>
-                <div class="cell-wrap column">
-                    <select class="check-select" aria-label="出勤状態">
-                    <option value="ー">ー</option>
-                    <option value="〇">〇</option>
-                    <option value="✕">✕</option>
-                    </select>
-
-                    <select class="time-select start" aria-label="開始時刻">
-                    <option value="">--</option>
-                    <option>09:00</option><option>09:30</option><option>10:00</option>
-                    <option>10:30</option><option>11:00</option><option>11:30</option>
-                    <option>12:00</option><option>12:30</option><option>13:00</option>
-                    <option>13:30</option><option>14:00</option><option>14:30</option>
-                    <option>15:00</option><option>15:30</option><option>16:00</option>
-                    <option>16:30</option><option>17:00</option><option>17:30</option>
-                    <option>18:00</option><option>18:30</option><option>19:00</option>
-                    <option>19:30</option><option>20:00</option>
-                    </select>
-
-                    <span class="tilde" aria-hidden="true">｜</span>
-
-                    <select class="time-select end" aria-label="終了時刻">
-                    <option value="">--</option>
-                    <option>12:00</option><option>12:30</option><option>13:00</option>
-                    <option>13:30</option><option>14:00</option><option>14:30</option>
-                    <option>15:00</option><option>15:30</option><option>16:00</option>
-                    <option>16:30</option><option>17:00</option><option>17:30</option>
-                    <option>18:00</option><option>18:30</option><option>19:00</option>
-                    <option>19:30</option><option>20:00</option><option>20:30</option>
-                    <option>21:00</option><option>21:30</option><option>22:00</option>
-                    </select>
-                </div>
-            </td>
-
-            <!-- テンプレート内の1セル（縦並び） -->
-            <td>
-                <div class="cell-wrap column">
-                    <select class="check-select" aria-label="出勤状態">
-                    <option value="ー">ー</option>
-                    <option value="〇">〇</option>
-                    <option value="✕">✕</option>
-                    </select>
-
-                    <select class="time-select start" aria-label="開始時刻">
-                    <option value="">--</option>
-                    <option>09:00</option><option>09:30</option><option>10:00</option>
-                    <option>10:30</option><option>11:00</option><option>11:30</option>
-                    <option>12:00</option><option>12:30</option><option>13:00</option>
-                    <option>13:30</option><option>14:00</option><option>14:30</option>
-                    <option>15:00</option><option>15:30</option><option>16:00</option>
-                    <option>16:30</option><option>17:00</option><option>17:30</option>
-                    <option>18:00</option><option>18:30</option><option>19:00</option>
-                    <option>19:30</option><option>20:00</option>
-                    </select>
-
-                    <span class="tilde" aria-hidden="true">｜</span>
-
-                    <select class="time-select end" aria-label="終了時刻">
-                    <option value="">--</option>
-                    <option>12:00</option><option>12:30</option><option>13:00</option>
-                    <option>13:30</option><option>14:00</option><option>14:30</option>
-                    <option>15:00</option><option>15:30</option><option>16:00</option>
-                    <option>16:30</option><option>17:00</option><option>17:30</option>
-                    <option>18:00</option><option>18:30</option><option>19:00</option>
-                    <option>19:30</option><option>20:00</option><option>20:30</option>
-                    <option>21:00</option><option>21:30</option><option>22:00</option>
-                    </select>
-                </div>
-            </td>
-
-            <!-- テンプレート内の1セル（縦並び） -->
-            <td>
-                <div class="cell-wrap column">
-                    <select class="check-select" aria-label="出勤状態">
-                    <option value="ー">ー</option>
-                    <option value="〇">〇</option>
-                    <option value="✕">✕</option>
-                    </select>
-
-                    <select class="time-select start" aria-label="開始時刻">
-                    <option value="">--</option>
-                    <option>09:00</option><option>09:30</option><option>10:00</option>
-                    <option>10:30</option><option>11:00</option><option>11:30</option>
-                    <option>12:00</option><option>12:30</option><option>13:00</option>
-                    <option>13:30</option><option>14:00</option><option>14:30</option>
-                    <option>15:00</option><option>15:30</option><option>16:00</option>
-                    <option>16:30</option><option>17:00</option><option>17:30</option>
-                    <option>18:00</option><option>18:30</option><option>19:00</option>
-                    <option>19:30</option><option>20:00</option>
-                    </select>
-
-                    <span class="tilde" aria-hidden="true">｜</span>
-
-                    <select class="time-select end" aria-label="終了時刻">
-                    <option value="">--</option>
-                    <option>12:00</option><option>12:30</option><option>13:00</option>
-                    <option>13:30</option><option>14:00</option><option>14:30</option>
-                    <option>15:00</option><option>15:30</option><option>16:00</option>
-                    <option>16:30</option><option>17:00</option><option>17:30</option>
-                    <option>18:00</option><option>18:30</option><option>19:00</option>
-                    <option>19:30</option><option>20:00</option><option>20:30</option>
-                    <option>21:00</option><option>21:30</option><option>22:00</option>
-                    </select>
-                </div>
-            </td>
-
-            <!-- テンプレート内の1セル（縦並び） -->
-            <td>
-                <div class="cell-wrap column">
-                    <select class="check-select" aria-label="出勤状態">
-                    <option value="ー">ー</option>
-                    <option value="〇">〇</option>
-                    <option value="✕">✕</option>
-                    </select>
-
-                    <select class="time-select start" aria-label="開始時刻">
-                    <option value="">--</option>
-                    <option>09:00</option><option>09:30</option><option>10:00</option>
-                    <option>10:30</option><option>11:00</option><option>11:30</option>
-                    <option>12:00</option><option>12:30</option><option>13:00</option>
-                    <option>13:30</option><option>14:00</option><option>14:30</option>
-                    <option>15:00</option><option>15:30</option><option>16:00</option>
-                    <option>16:30</option><option>17:00</option><option>17:30</option>
-                    <option>18:00</option><option>18:30</option><option>19:00</option>
-                    <option>19:30</option><option>20:00</option>
-                    </select>
-
-                    <span class="tilde" aria-hidden="true">｜</span>
-
-                    <select class="time-select end" aria-label="終了時刻">
-                    <option value="">--</option>
-                    <option>12:00</option><option>12:30</option><option>13:00</option>
-                    <option>13:30</option><option>14:00</option><option>14:30</option>
-                    <option>15:00</option><option>15:30</option><option>16:00</option>
-                    <option>16:30</option><option>17:00</option><option>17:30</option>
-                    <option>18:00</option><option>18:30</option><option>19:00</option>
-                    <option>19:30</option><option>20:00</option><option>20:30</option>
-                    <option>21:00</option><option>21:30</option><option>22:00</option>
-                    </select>
-                </div>
-            </td>
-
-            <!-- テンプレート内の1セル（縦並び） -->
-            <td>
-                <div class="cell-wrap column">
-                    <select class="check-select" aria-label="出勤状態">
-                    <option value="ー">ー</option>
-                    <option value="〇">〇</option>
-                    <option value="✕">✕</option>
-                    </select>
-
-                    <select class="time-select start" aria-label="開始時刻">
-                    <option value="">--</option>
-                    <option>09:00</option><option>09:30</option><option>10:00</option>
-                    <option>10:30</option><option>11:00</option><option>11:30</option>
-                    <option>12:00</option><option>12:30</option><option>13:00</option>
-                    <option>13:30</option><option>14:00</option><option>14:30</option>
-                    <option>15:00</option><option>15:30</option><option>16:00</option>
-                    <option>16:30</option><option>17:00</option><option>17:30</option>
-                    <option>18:00</option><option>18:30</option><option>19:00</option>
-                    <option>19:30</option><option>20:00</option>
-                    </select>
-
-                    <span class="tilde" aria-hidden="true">｜</span>
-
-                    <select class="time-select end" aria-label="終了時刻">
-                    <option value="">--</option>
-                    <option>12:00</option><option>12:30</option><option>13:00</option>
-                    <option>13:30</option><option>14:00</option><option>14:30</option>
-                    <option>15:00</option><option>15:30</option><option>16:00</option>
-                    <option>16:30</option><option>17:00</option><option>17:30</option>
-                    <option>18:00</option><option>18:30</option><option>19:00</option>
-                    <option>19:30</option><option>20:00</option><option>20:30</option>
-                    <option>21:00</option><option>21:30</option><option>22:00</option>
-                    </select>
-                </div>
-            </td>
-
-          </tr>
-        </tbody>
-      </table>
-    </article>
-  </template>
-
-  <!-- スクリプト用の状態保持要素（必要なら使用） -->
-  <div id="appState" hidden data-next-id="1"></div>
-
-  <!-- 視覚的に隠すユーティリティ（CSSで定義してください） -->
-  <style>
-    .visually-hidden {
-      position: absolute !important;
-      height: 1px; width: 1px;
-      overflow: hidden;
-      clip: rect(1px, 1px, 1px, 1px);
-      white-space: nowrap;
-      border: 0; padding: 0; margin: -1px;
-    }
-  </style>
 </body>
 </html>
