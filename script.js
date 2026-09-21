@@ -1,312 +1,424 @@
-// ===============================
-// モーダル関連
-// ===============================
-const modal = document.getElementById("nameModal");
-const modalInput = document.getElementById("modalNameInput");
-const modalOk = document.getElementById("modalOkBtn");
-const modalCancel = document.getElementById("modalCancelBtn");
+// script.js (mobile-friendly)
+(() => {
+  // --- ユーティリティ ---
+  const $ = sel => document.querySelector(sel);
+  const $$ = sel => Array.from(document.querySelectorAll(sel));
+  const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-// 追加ボタン → モーダル表示
-document.getElementById("addPersonBtn").onclick = () => {
-    modal.style.display = "block";
-    modalInput.value = "";
-    modalInput.focus();
-};
+  const debounce = (fn, wait = 300) => {
+    let t;
+    return (...args) => {
+      clearTimeout(t);
+      t = setTimeout(() => fn(...args), wait);
+    };
+  };
 
-// ===============================
-// 個別枠追加（復元にも使う）
-// ===============================
-function addIndividual(name, days = null) {
-    const container = document.getElementById("personContainer");
+  // --- DOM 要素 ---
+  const nameModal = $("#nameModal");
+  const modalInput = $("#modalNameInput");
+  const modalOk = $("#modalOkBtn");
+  const modalCancel = $("#modalCancelBtn");
+  const addPersonBtn = $("#addPersonBtn");
+  const personContainer = $("#personContainer");
+  const deleteModal = $("#deleteModal");
+  const deleteOkBtn = $("#deleteOkBtn");
+  const deleteCancelBtn = $("#deleteCancelBtn");
+  const printBtn = $("#printBtn");
+  const restoreBtn = $("#restoreBtn");
+  const restoreModal = $("#restoreModal");
+  const copyDataBtn = $("#copyDataBtn");
+  const pasteDataBtn = $("#pasteDataBtn");
+  const restoreCancelBtn = $("#restoreCancelBtn");
+  const personTemplate = $("#personTemplate");
 
-    const html = `
-        <div class="individual">
-            <div class="top-row">
-                <input type="text" class="name-input" value="${name}">
-                <button class="delete-btn">削除</button>
-            </div>
+  // --- 状態 ---
+  let deleteTarget = null;
+  let isRestoring = false;
+  let lastFocusedBeforeModal = null;
+  const LONG_PRESS_MS = 600; // 長押し判定（ミリ秒）
+  const saveDebounced = debounce(saveData, 350);
 
-            <table class="shift-table">
-                <tr>
-                    <th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th><th>日</th>
-                </tr>
-                <tr>
-                    ${[...Array(7)].map(() => `
-                        <td>
-                            <div class="cell-wrap">
-                                <select class="check-select">
-                                    <option class="mitei">ー</option>
-                                    <option class="maru">〇</option>
-                                    <option class="batu">✕</option>
-                                </select>
+  // --- モーダル制御（スマホ向けにスクロール対策） ---
+  function openModal(modalEl) {
+    if (!modalEl) return;
+    lastFocusedBeforeModal = document.activeElement;
+    modalEl.classList.add("is-open");
+    modalEl.hidden = false;
+    modalEl.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
 
-                                <select class="time-select start-select">
-                                    <option value="">--</option>
-                                    <option>09:00</option><option>09:30</option><option>10:00</option>
-                                    <option>10:30</option><option>11:00</option><option>11:30</option>
-                                    <option>12:00</option><option>12:30</option><option>13:00</option>
-                                    <option>13:30</option><option>14:00</option><option>14:30</option>
-                                    <option>15:00</option><option>15:30</option><option>16:00</option>
-                                    <option>16:30</option><option>17:00</option><option>17:30</option>
-                                    <option>18:00</option><option>18:30</option><option>19:00</option>
-                                    <option>19:30</option><option>20:00</option>
-                                </select>
+    // フォーカスとスクロール調整（仮想キーボード対策）
+    const focusable = modalEl.querySelector("input, button, [tabindex]:not([tabindex='-1'])");
+    if (focusable) {
+      focusable.focus();
+      // スマホでキーボードに隠れないよう中央にスクロール
+      setTimeout(() => {
+        try { focusable.scrollIntoView({ block: "center", behavior: "smooth" }); } catch (e) {}
+      }, 50);
+    }
+  }
 
-                                <span class="tilde">｜</span>
+  function closeModal(modalEl) {
+    if (!modalEl) return;
+    modalEl.classList.remove("is-open");
+    modalEl.hidden = true;
+    modalEl.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+    // フォーカスを戻す
+    if (lastFocusedBeforeModal && typeof lastFocusedBeforeModal.focus === "function") {
+      lastFocusedBeforeModal.focus();
+      lastFocusedBeforeModal = null;
+    }
+  }
 
-                                <select class="time-select end-select">
-                                    <option value="">--</option>
-                                    <option>12:00</option><option>12:30</option><option>13:00</option>
-                                    <option>13:30</option><option>14:00</option><option>14:30</option>
-                                    <option>15:00</option><option>15:30</option><option>16:00</option>
-                                    <option>16:30</option><option>17:00</option><option>17:30</option>
-                                    <option>18:00</option><option>18:30</option><option>19:00</option>
-                                    <option>19:30</option><option>20:00</option><option>20:30</option>
-                                    <option>21:00</option><option>21:30</option><option>22:00</option>
-                                </select>
-                            </div>
-                        </td>
-                    `).join("")}
-                </tr>
-            </table>
-        </div>
-    `;
+  // ESC で閉じる（物理キーボードや外付けキーボード対応）
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      [nameModal, deleteModal, restoreModal].forEach(m => {
+        if (m && !m.hidden) closeModal(m);
+      });
+    }
+  });
 
-    container.insertAdjacentHTML("beforeend", html);
+  // --- 色反映ユーティリティ（クラス切替） ---
+  function applySelectColor(selectEl) {
+    if (!selectEl) return;
+    selectEl.classList.remove("maru", "batu", "mitei");
+    const v = selectEl.value;
+    if (v === "〇") selectEl.classList.add("maru");
+    else if (v === "✕") selectEl.classList.add("batu");
+    else selectEl.classList.add("mitei");
+  }
 
-    const ind = container.lastElementChild;
-
-    // 復元データがある場合
-    if (days) {
-        const cells = ind.querySelectorAll("td");
+  // --- 個別カード生成 ---
+  function createIndividualElement(name, days = null) {
+    if (personTemplate) {
+      const node = personTemplate.content.firstElementChild.cloneNode(true);
+      const nameInput = node.querySelector(".name-input");
+      if (nameInput) nameInput.value = name;
+      if (days) {
+        const cells = node.querySelectorAll("td");
         days.slice(0, 7).forEach((d, i) => {
-            const checkSel = cells[i].querySelector(".check-select");
-            const startSel = cells[i].querySelector(".start-select");
-            const endSel = cells[i].querySelector(".end-select");
-
-            checkSel.value = d.check;
-            startSel.value = d.start;
-            endSel.value = d.end;
-
-            applyCheckStyle(checkSel);
-            applyTimeState(checkSel, startSel, endSel);
+          const selects = cells[i].querySelectorAll("select");
+          if (selects[0]) selects[0].value = d.check || "";
+          if (selects[1]) selects[1].value = d.start || "";
+          if (selects[2]) selects[2].value = d.end || "";
+          applySelectColor(selects[0]);
         });
-    } else {
-        // 新規追加時は初期状態を反映
-        const cells = ind.querySelectorAll("td");
-        cells.forEach(cell => {
-            const checkSel = cell.querySelector(".check-select");
-            const startSel = cell.querySelector(".start-select");
-            const endSel = cell.querySelector(".end-select");
-            applyCheckStyle(checkSel);
-            applyTimeState(checkSel, startSel, endSel);
-        });
+      }
+      // モバイルではタップ領域を広げるためにボタンに大きめのタッチ属性を付与（CSSで対応）
+      return node;
     }
 
-    // 新規追加直後に保存
-    saveData();
-}
+    // テンプレートがない場合のフォールバック（安全にDOM生成）
+    const wrapper = document.createElement("div");
+    wrapper.className = "individual";
 
-// OK → 新しい枠追加
-modalOk.onclick = () => {
-    const name = modalInput.value.trim();
-    if (!name) return;
+    const top = document.createElement("div");
+    top.className = "top-row";
 
-    addIndividual(name);
-    modal.style.display = "none";
-};
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "name-input";
+    input.value = name;
+    input.setAttribute("inputmode", "text");
 
-// Enterキー
-modalInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") modalOk.click();
-});
+    const delBtn = document.createElement("button");
+    delBtn.type = "button";
+    delBtn.className = "delete-btn btn";
+    delBtn.textContent = "削除";
 
-// キャンセル
-modalCancel.onclick = () => {
-    modal.style.display = "none";
-};
+    top.appendChild(input);
+    top.appendChild(delBtn);
+    wrapper.appendChild(top);
 
-// ===============================
-// 〇✕の色＆時間欄状態
-// ===============================
-function applyCheckStyle(select) {
-    const val = select.value;
-    if (val === "〇") select.style.color = "red";
-    else if (val === "✕") select.style.color = "#0088ff";
-    else select.style.color = "black";
-}
+    const table = document.createElement("table");
+    table.className = "shift-table";
+    const trHead = document.createElement("tr");
+    ["月","火","水","木","金","土","日"].forEach(t => {
+      const th = document.createElement("th");
+      th.textContent = t;
+      trHead.appendChild(th);
+    });
+    table.appendChild(trHead);
 
-function applyTimeState(checkSel, startSel, endSel) {
-    const val = checkSel.value;
-    if (val === "✕") {
-        startSel.value = "";
-        endSel.value = "";
-        startSel.classList.add("time-disabled");
-        endSel.classList.add("time-disabled");
-        startSel.disabled = true;
-        endSel.disabled = true;
-    } else {
-        startSel.classList.remove("time-disabled");
-        endSel.classList.remove("time-disabled");
-        startSel.disabled = false;
-        endSel.disabled = false;
+    const tr = document.createElement("tr");
+    const times = [
+      "09:00","09:30","10:00","10:30","11:00","11:30",
+      "12:00","12:30","13:00","13:30","14:00","14:30",
+      "15:00","15:30","16:00","16:30","17:00","17:30",
+      "18:00","18:30","19:00","19:30","20:00","20:30","21:00","21:30","22:00"
+    ];
+    for (let i = 0; i < 7; i++) {
+      const td = document.createElement("td");
+      const cellWrap = document.createElement("div");
+      cellWrap.className = "cell-wrap";
+
+      const selCheck = document.createElement("select");
+      selCheck.className = "check-select";
+      ["ー","〇","✕"].forEach(v => {
+        const opt = document.createElement("option");
+        opt.value = v;
+        opt.textContent = v;
+        selCheck.appendChild(opt);
+      });
+
+      const selStart = document.createElement("select");
+      selStart.className = "time-select start";
+      const selEnd = document.createElement("select");
+      selEnd.className = "time-select end";
+
+      const emptyOpt = document.createElement("option");
+      emptyOpt.value = "";
+      emptyOpt.textContent = "--";
+      selStart.appendChild(emptyOpt.cloneNode(true));
+      selEnd.appendChild(emptyOpt.cloneNode(true));
+      times.forEach(t => {
+        const o1 = document.createElement("option");
+        o1.value = t;
+        o1.textContent = t;
+        selStart.appendChild(o1);
+        const o2 = document.createElement("option");
+        o2.value = t;
+        o2.textContent = t;
+        selEnd.appendChild(o2);
+      });
+
+      cellWrap.appendChild(selCheck);
+      cellWrap.appendChild(selStart);
+      const tilde = document.createElement("span");
+      tilde.className = "tilde";
+      tilde.textContent = "｜";
+      cellWrap.appendChild(tilde);
+      cellWrap.appendChild(selEnd);
+      td.appendChild(cellWrap);
+      tr.appendChild(td);
+
+      if (days && days[i]) {
+        selCheck.value = days[i].check || "";
+        selStart.value = days[i].start || "";
+        selEnd.value = days[i].end || "";
+        applySelectColor(selCheck);
+      }
     }
-}
+    table.appendChild(tr);
+    wrapper.appendChild(table);
+    return wrapper;
+  }
 
-// 全ての select 変更時
-document.addEventListener("change", (e) => {
-    if (e.target.classList.contains("check-select")) {
-        const cell = e.target.closest("td");
-        const startSel = cell.querySelector(".start-select");
-        const endSel = cell.querySelector(".end-select");
-        applyCheckStyle(e.target);
-        applyTimeState(e.target, startSel, endSel);
-    }
-    saveData();
-});
+  function addIndividual(name, days = null) {
+    const el = createIndividualElement(name, days);
+    personContainer.appendChild(el);
+    // スクロールして追加したカードを見せる（スマホで視認性向上）
+    setTimeout(() => {
+      try { el.scrollIntoView({ behavior: "smooth", block: "center" }); } catch (e) {}
+    }, 50);
+    saveDebounced();
+  }
 
-// 名前入力も保存
-document.addEventListener("input", (e) => {
-    if (e.target.classList.contains("name-input")) {
-        saveData();
-    }
-});
-
-// ===============================
-// 印刷
-// ===============================
-document.getElementById("printBtn").onclick = () => window.print();
-
-// ===============================
-// 削除モーダル
-// ===============================
-let deleteTarget = null;
-
-document.addEventListener("click", (e) => {
-    if (e.target.classList.contains("delete-btn")) {
-        deleteTarget = e.target.closest(".individual");
-        document.getElementById("deleteModal").style.display = "block";
-    }
-});
-
-document.getElementById("deleteOkBtn").onclick = () => {
-    if (deleteTarget) {
-        deleteTarget.classList.add("fade-out");
-        setTimeout(() => {
-            deleteTarget.remove();
-            saveData();
-        }, 200);
-    }
-    deleteTarget = null;
-    document.getElementById("deleteModal").style.display = "none";
-};
-
-document.getElementById("deleteCancelBtn").onclick = () => {
-    deleteTarget = null;
-    document.getElementById("deleteModal").style.display = "none";
-};
-
-// ===============================
-// 保存（完全版）
-// ===============================
-let isRestoring = false;
-
-function saveData() {
+  // --- 保存処理 ---
+  function saveData() {
     if (isRestoring) return;
-
-    const individuals = document.querySelectorAll(".individual");
-    const data = [];
-
-    individuals.forEach(ind => {
-        const name = ind.querySelector(".name-input").value;
-        const cells = ind.querySelectorAll("td");
-        const days = [];
-
-        cells.forEach(cell => {
-            const checkSel = cell.querySelector(".check-select");
-            const startSel = cell.querySelector(".start-select");
-            const endSel = cell.querySelector(".end-select");
-
-            days.push({
-                check: checkSel?.value || "ー",
-                start: startSel?.value || "",
-                end: endSel?.value || ""
-            });
+    const individuals = [];
+    personContainer.querySelectorAll(".individual").forEach(ind => {
+      const nameInput = ind.querySelector(".name-input");
+      const name = nameInput ? nameInput.value : "";
+      const days = [];
+      ind.querySelectorAll("td").forEach(td => {
+        const selects = td.querySelectorAll("select");
+        days.push({
+          check: selects[0] ? selects[0].value : "",
+          start: selects[1] ? selects[1].value : "",
+          end: selects[2] ? selects[2].value : ""
         });
+      });
+      individuals.push({ name, days: days.slice(0, 7) });
+    });
+    try {
+      localStorage.setItem("shiftData", JSON.stringify(individuals));
+    } catch (err) {
+      console.error("保存に失敗しました", err);
+    }
+  }
 
-        data.push({ name, days: days.slice(0, 7) });
+  // --- 読み込み ---
+  function loadData() {
+    const raw = localStorage.getItem("shiftData");
+    if (!raw) return;
+    try {
+      const data = JSON.parse(raw);
+      if (!Array.isArray(data)) return;
+      isRestoring = true;
+      personContainer.querySelectorAll(".individual").forEach(n => n.remove());
+      data.forEach(item => addIndividual(item.name || "", item.days || null));
+    } catch (err) {
+      console.error("復元データが不正です", err);
+    } finally {
+      isRestoring = false;
+    }
+  }
+
+  // --- 長押し（long-press）で削除確認（モバイル向け） ---
+  const longPressMap = new WeakMap();
+  function startLongPress(target) {
+    if (!target) return;
+    const t = setTimeout(() => {
+      // 長押し確定
+      deleteTarget = target.closest(".individual");
+      openModal(deleteModal);
+    }, LONG_PRESS_MS);
+    longPressMap.set(target, t);
+  }
+  function cancelLongPress(target) {
+    const t = longPressMap.get(target);
+    if (t) {
+      clearTimeout(t);
+      longPressMap.delete(target);
+    }
+  }
+
+  // --- 初期化 ---
+  function init() {
+    // add ボタン
+    addPersonBtn.addEventListener("click", () => {
+      modalInput.value = "";
+      openModal(nameModal);
+    }, { passive: true });
+
+    // モーダル OK / Cancel
+    modalOk.addEventListener("click", () => {
+      const name = modalInput.value.trim();
+      if (!name) return;
+      addIndividual(name);
+      closeModal(nameModal);
+    });
+    modalCancel.addEventListener("click", () => closeModal(nameModal));
+
+    modalInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") modalOk.click();
     });
 
-    localStorage.setItem("shiftData", JSON.stringify(data));
-}
+    // イベントデリゲーション: 削除ボタン（クリック/タッチ）と select の色反映
+    // クリックは通常の操作、タッチは長押しで削除確認を出す
+    document.addEventListener("click", (e) => {
+      const del = e.target.closest(".delete-btn");
+      if (del) {
+        // クリックで即確認（短押し）
+        deleteTarget = del.closest(".individual");
+        openModal(deleteModal);
+      }
+    }, { passive: true });
 
-// ===============================
-// 読み込み（復元）
-// ===============================
-function loadData() {
-    const saved = localStorage.getItem("shiftData");
-    if (!saved) return;
+    if (isTouch) {
+      // タッチ開始で長押し開始、タッチ終了でキャンセル
+      document.addEventListener("touchstart", (e) => {
+        const del = e.target.closest(".delete-btn");
+        if (del) startLongPress(del);
+      }, { passive: true });
 
-    isRestoring = true;
+      document.addEventListener("touchend", (e) => {
+        const del = e.target.closest(".delete-btn");
+        if (del) cancelLongPress(del);
+      }, { passive: true });
 
-    const container = document.getElementById("personContainer");
-    container.innerHTML = "";
-
-    const data = JSON.parse(saved);
-    data.forEach(item => addIndividual(item.name, item.days));
-
-    isRestoring = false;
-    saveData(); // 復元後に再保存して形式を安定化
-}
-
-window.onload = () => {
-    // テーマ復元
-    const theme = localStorage.getItem("theme") || "light";
-    if (theme === "dark") document.body.classList.add("dark");
-
-    loadData();
-};
-
-// ===============================
-// 復元モーダル
-// ===============================
-document.getElementById("restoreBtn").onclick = () => {
-    document.getElementById("restoreModal").style.display = "block";
-};
-
-document.getElementById("restoreCancelBtn").onclick = () => {
-    document.getElementById("restoreModal").style.display = "none";
-};
-
-// ===============================
-// コピー
-// ===============================
-document.getElementById("copyDataBtn").onclick = () => {
-    const data = localStorage.getItem("shiftData") || "[]";
-    navigator.clipboard.writeText(data);
-    alert("コピーしました！");
-};
-
-// ===============================
-// 貼り付け（即復元）
-// ===============================
-document.getElementById("pasteDataBtn").onclick = async () => {
-    const text = await navigator.clipboard.readText();
-    try {
-        localStorage.setItem("shiftData", text);
-        alert("貼り付けました！復元します");
-
-        loadData();
-    } catch {
-        alert("データが正しくありません");
+      // タッチキャンセル（スクロールなど）でもキャンセル
+      document.addEventListener("touchmove", (e) => {
+        const del = e.target.closest(".delete-btn");
+        if (del) cancelLongPress(del);
+      }, { passive: true });
     }
-};
 
-// ===============================
-// テーマ切り替え
-// ===============================
-document.getElementById("themeToggleBtn").onclick = () => {
-    document.body.classList.toggle("dark");
-    const theme = document.body.classList.contains("dark") ? "dark" : "light";
-    localStorage.setItem("theme", theme);
-};
+    // select の change と input の保存（デバウンス）
+    document.addEventListener("change", (e) => {
+      if (e.target && e.target.tagName === "SELECT") {
+        applySelectColor(e.target);
+      }
+      saveDebounced();
+    }, { passive: true });
+
+    document.addEventListener("input", (e) => {
+      // 名前入力など
+      saveDebounced();
+    }, { passive: true });
+
+    // 削除モーダル操作
+    deleteOkBtn.addEventListener("click", () => {
+      if (deleteTarget) deleteTarget.remove();
+      deleteTarget = null;
+      closeModal(deleteModal);
+      saveDebounced();
+    });
+    deleteCancelBtn.addEventListener("click", () => {
+      deleteTarget = null;
+      closeModal(deleteModal);
+    });
+
+    // 印刷（スマホでは非表示にしていることが多いが一応）
+    if (printBtn) printBtn.addEventListener("click", () => window.print(), { passive: true });
+
+    // 復元モーダル
+    if (restoreBtn) {
+      restoreBtn.addEventListener("click", () => openModal(restoreModal), { passive: true });
+      restoreCancelBtn.addEventListener("click", () => closeModal(restoreModal));
+    }
+
+    // コピー（クリップボード）: フォールバックあり
+    if (copyDataBtn) {
+      copyDataBtn.addEventListener("click", async () => {
+        const data = localStorage.getItem("shiftData") || "[]";
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(data);
+            alert("コピーしました！");
+          } else {
+            // フォールバック: prompt でユーザーにコピーしてもらう
+            window.prompt("以下をコピーしてください（長押しで選択）", data);
+          }
+        } catch (err) {
+          console.error(err);
+          alert("コピーに失敗しました");
+        }
+      }, { passive: true });
+    }
+
+    // 貼り付け（クリップボード）: フォールバックあり
+    if (pasteDataBtn) {
+      pasteDataBtn.addEventListener("click", async () => {
+        try {
+          let text = "";
+          if (navigator.clipboard && navigator.clipboard.readText) {
+            text = await navigator.clipboard.readText();
+          } else {
+            // フォールバック: prompt でユーザーに貼り付けてもらう
+            text = window.prompt("貼り付けるデータを入力してください（JSON形式）", "");
+            if (text === null) throw new Error("キャンセル");
+          }
+          const parsed = JSON.parse(text);
+          if (!Array.isArray(parsed)) throw new Error("形式不正");
+          localStorage.setItem("shiftData", JSON.stringify(parsed));
+          personContainer.querySelectorAll(".individual").forEach(n => n.remove());
+          isRestoring = true;
+          parsed.forEach(item => addIndividual(item.name || "", item.days || null));
+          isRestoring = false;
+          alert("貼り付けました！復元しました");
+        } catch (err) {
+          console.error(err);
+          alert("データが正しくありません");
+        }
+      }, { passive: true });
+    }
+
+    // 初回ロード
+    loadData();
+
+    // 追加: タップ操作で選択肢が小さく感じる場合、select をタップしやすくするために
+    // iOS/Android のネイティブピッカーを使うのが最も使いやすいので、JS側では特に変更しない。
+  }
+
+  // DOMContentLoaded で初期化
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
