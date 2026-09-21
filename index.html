@@ -8,6 +8,7 @@
 </head>
 <body>
     <header>
+        <button id="printBtn" class="print-btn">印刷</button>
         <h1>シフト管理</h1>
         <button id="addPersonBtn" class="add-btn">追加</button>
     </header>
@@ -195,6 +196,14 @@
     </div>
     <!-- 追加された人を入れる場所 -->
     <div id="personContainer"></div>
+    <!-- 削除確認モーダル -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <p style="font-size: 24px; margin-bottom: 20px;">削除しますか？</p>
+            <button id="deleteOkBtn">はい</button>
+            <button id="deleteCancelBtn">いいえ</button>
+        </div>
+    </div>
 
 </body>
 </html>
