@@ -1,385 +1,353 @@
-/* ============================
-   ベース
-============================ */
-body {
-    margin: 0;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background: #f5f2f2;
-    color: #333;
+:root{
+  --brand: #9e3e3e;
+  --accent: #ffbf00;
+  --bg: #ffffff;
+  --muted: #cccccc;
+  --gap: 1rem;
+  --radius: 0.875rem;
+  --base-font: 16px;
+  --shadow-1: 0 4px 10px rgba(0,0,0,0.12);
+  --shadow-2: 0 6px 18px rgba(0,0,0,0.08);
 }
 
-/* ダークモード */
-body.dark {
-    background: #1e1e1e;
-    color: #eee;
-}
+html { font-size: var(--base-font); box-sizing: border-box; }
+*, *::before, *::after { box-sizing: inherit; }
 
-body.dark header {
-    background: #5a1f1f;
-}
-
-body.dark .individual {
-    background: #2a2a2a;
-    border-color: #ffbf00;
-}
-
-body.dark .shift-table th {
-    background: #3a2626;
+body{
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  background: #faf7f7;
+  color: #111;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* ============================
-   ヘッダー
-============================ */
-header {
-    background: #9e3e3e;
-    color: white;
-    padding: 15px;
-    text-align: center;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    border-bottom-left-radius: 12px;
-    border-bottom-right-radius: 12px;
+   Header
+   ============================ */
+header.site-header{
+  background: var(--brand);
+  color: #fff;
+  padding: 0.75rem 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
 }
 
-h1 {
-    margin: 10px 0;
-    font-size: 32px;
+.site-title{
+  margin: 0;
+  font-size: 1.25rem;
+  text-align: center;
+  flex: 1;
 }
 
-.print-btn {
-    position: fixed;
-    top: 15px;
-    left: 15px;
-    background: white;
-    color: #9e3e3e;
-    border: 3px solid #ffbf00;
-    padding: 8px 16px;
-    font-size: 20px;
-    border-radius: 12px;
-    cursor: pointer;
-    z-index: 50;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    transition: transform 0.1s ease, box-shadow 0.1s ease;
+/* Header groups */
+.header-left, .header-right { display: flex; gap: 0.5rem; align-items: center; }
+
+/* ============================
+   Buttons (共通)
+   ============================ */
+.btn{
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  background: var(--bg);
+  color: var(--brand);
+  border: 4px solid var(--accent);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-1);
+  font-size: 1rem;
+}
+.btn:focus{
+  outline: 3px solid rgba(158,62,62,0.25);
+  outline-offset: 2px;
 }
 
-.print-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 14px rgba(0,0,0,0.2);
-}
+/* 特殊ボタン */
+.print-btn { background: #fff; color: var(--brand); }
+.restore-open-btn { background: #fff; color: var(--brand); }
 
-.print-btn:active {
-    transform: scale(0.96);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-}
-
-.restore-btn-header {
-    top: 70px;
-}
-
-.theme-btn {
-    left: auto;
-    right: 15px;
-}
-
-/* 追加ボタン */
-.add-btn {
-    position: fixed;
-    top: 80px;
-    right: 15px;
-    background: #ffbf00;
-    color: #9e3e3e;
-    border: none;
-    padding: 10px 16px;
-    font-size: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-    z-index: 50;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    transition: transform 0.1s ease, box-shadow 0.1s ease;
-}
-
-.add-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 14px rgba(0,0,0,0.2);
-}
-
-.add-btn:active {
-    transform: scale(0.95);
+/* 追加ボタン（丸型） */
+.add-btn{
+  border-radius: 50%;
+  padding: 0.4rem;
+  width: clamp(3rem, 6vw, 4.2rem);
+  height: clamp(3rem, 6vw, 4.2rem);
+  display: inline-grid;
+  place-items: center;
+  font-size: 1.1rem;
 }
 
 /* ============================
-   モーダル
-============================ */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.4);
-    z-index: 200;
+   Main / Person container
+   ============================ */
+main#main{
+  padding: 1rem;
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
-.modal-content {
-    background: white;
-    width: 80%;
-    max-width: 350px;
-    margin: 150px auto;
-    padding: 20px;
-    border-radius: 14px;
-    text-align: center;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
-}
-
-#modalNameInput {
-    width: 90%;
-    padding: 12px;
-    font-size: 16px;
-    border: 2px solid #9e3e3e;
-    border-radius: 8px;
-    margin: 0 auto 15px auto;
-    box-sizing: border-box;
-}
-
-#modalOkBtn,
-#modalCancelBtn {
-    padding: 12px 16px;
-    font-size: 18px;
-    border-radius: 8px;
-    min-width: 110px;
-    border: none;
-    cursor: pointer;
-    margin: 5px;
-}
-
-#modalOkBtn {
-    background: #9e3e3e;
-    color: white;
-}
-
-#modalCancelBtn {
-    background: #ccc;
-    color: #333;
+.person-container{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
 /* ============================
-   個別枠
-============================ */
-#personContainer {
-    padding: 10px;
+   Individual card
+   ============================ */
+.individual{
+  background: var(--bg);
+  border: 2px solid var(--brand);
+  border-radius: 14px;
+  padding: 1rem;
+  box-shadow: var(--shadow-2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
-.individual {
-    background: white;
-    border: 2px solid #9e3e3e;
-    border-radius: 14px;
-    padding: 15px;
-    margin: 20px 10px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
-    position: relative;
-    animation: fadeIn 0.25s ease;
+/* top row: name + controls */
+.top-row{
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
 }
-
-/* 削除時フェードアウト */
-.individual.fade-out {
-    animation: fadeOut 0.2s ease forwards;
-    height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden;
+.name-input{
+  flex: 1;
+  padding: 0.6rem;
+  font-size: 1rem;
+  border: 2px solid var(--brand);
+  border-radius: 0.5rem;
 }
-
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeOut {
-    from { opacity: 1; transform: translateY(0); }
-    to   { opacity: 0; transform: translateY(8px); }
-}
-
-/* 名前 + 削除ボタン */
-.top-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-}
-
-.name-input {
-    flex: 8;
-    padding: 10px;
-    font-size: 16px;
-    border: 2px solid #9e3e3e;
-    border-radius: 10px;
-}
-
-/* 削除ボタン */
-.delete-btn {
-    flex: 2;
-    background: #9e3e3e;
-    color: white;
-    border: none;
-    padding: 10px 14px;
-    font-size: 14px;
-    border-radius: 10px;
-    cursor: pointer;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+.person-controls{ display: flex; gap: 0.5rem; align-items: center; }
+.delete-btn{
+  background: var(--brand);
+  color: #fff;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
 }
 
 /* ============================
-   table
-============================ */
-.shift-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
+   Shift table / cells
+   ============================ */
+.shift-table{
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.25rem;
+}
+.shift-table th, .shift-table td{
+  padding: 0.4rem;
+  border: 1px solid var(--brand);
+  text-align: center;
+  vertical-align: middle;
+}
+.shift-table th{
+  background: #f7eaea;
+  font-weight: 700;
 }
 
-.shift-table th,
-.shift-table td {
-    width: 70px;
-    text-align: center;
-    padding: 8px;
-    border: 1px solid #9e3e3e;
-}
-
-.shift-table th {
-    background: #f7eaea;
-    font-weight: bold;
-    border-radius: 6px;
-}
-
-/* セル内ラップ */
+/* cell wrap */
 .cell-wrap {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    align-items: center;
+  display: flex;
+  flex-direction: column; /* 縦並び */
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0;
 }
 
-/* 〇✕ー select */
-.shift-table select {
-    width: 100%;
-    padding: 6px;
-    border: 1px solid #9e3e3e;
-    border-radius: 10px;
-    font-size: 16px;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    color: inherit;
-    background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
-    background-repeat: no-repeat;
-    background-position: right 6px center;
-    background-size: 16px;
-    padding-right: 26px;
+/* select 共通 */
+select, input[type="text"]{
+  font-family: inherit;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--brand);
+  padding: 0.4rem 0.5rem;
+  background: #fff;
+  color: inherit;
 }
 
+/* check select と time select */
+.check-select {
+  width: 100%;
+  max-width: 120px;
+  text-align: center;
+  font-weight: 700;
+  background: #f7eaea;
+  padding: 0.45rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--brand);
+}
 .time-select {
-    padding: 4px;
-    font-size: 14px;
-    border: 1px solid #9e3e3e;
-    border-radius: 6px;
-    width: 100%;
-    box-sizing: border-box;
+  width: 100%;
+  max-width: 140px;
+  padding: 0.45rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--brand);
+  text-align: center;
 }
-
-/* 時間無効化 */
-.time-disabled {
-    opacity: 0.4;
-}
-
-/* 〇✕色 */
-.maru { color: red; }
-.batu { color: #0088ff; }
-.mitei { color: black; }
-
-/* 区切り */
+/* tilde */
 .tilde {
-    font-size: 14px;
+  color: black;
+  font-size: 1.1rem;
+  line-height: 1;
+  margin: 0;
+}
+.shift-table th, .shift-table td {
+  padding: 0.6rem 0.4rem;
+}
+/* 色クラス（スタイルはCSSで管理） */
+.maru{ color: #d32f2f !important; }
+.batu{ color: #0288d1 !important; }
+.mitei{ color: #111 !important; }
+
+/* ============================
+   Modal
+   ============================ */
+.modal{
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.modal.is-open{ display: flex; }
+.modal[hidden]{ display: none !important; }
+
+.modal-content{
+  background: var(--bg);
+  width: min(420px, 95%);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-2);
+  text-align: center;
+}
+
+/* modal actions */
+.modal-actions{ display: flex; gap: 0.5rem; justify-content: center; margin-top: 0.75rem; }
+.modal .danger{ background: var(--brand); color: #fff; border-radius: 0.5rem; padding: 0.5rem 0.75rem; }
+
+/* ============================
+   Restore buttons
+   ============================ */
+.restore-btn{ background: var(--brand); color: #fff; padding: 0.6rem 0.8rem; border-radius: 0.6rem; }
+.restore-cancel-btn{ background: var(--muted); color: #333; padding: 0.6rem 0.8rem; border-radius: 0.6rem; }
+
+/* ============================
+   Responsive: small screens
+   ============================ */
+@media (max-width: 480px) {
+  /* person-container を単一列にしてカード幅を確保 */
+  .person-container {
+    display: block;           /* グリッドを解除 */
+    padding: 0.5rem;
+  }
+
+  .person-container .individual {
+    width: 100%;              /* 親幅いっぱいに広げる */
+    min-width: 0;
+    margin: 0 0 1rem 0;       /* カード間の余白 */
+    box-sizing: border-box;
+  }
+
+  /* テーブルを縦レイアウト寄せにして横スクロールを防ぐ */
+  .shift-table {
+    width: 100%;
+    table-layout: fixed;      /* セル幅を均等に */
+    overflow: visible;
+  }
+  .shift-table th, .shift-table td {
+    word-break: break-word;
+    white-space: normal;
+    padding: 0.6rem 0.4rem;
+  }
+
+  /* セル内縦並び（既に適用済みなら調整） */
+  .cell-wrap.column {
+    align-items: stretch;
+  }
+
+  /* フォントとタップ領域を大きく */
+  :root { --mobile-font-scale: 1.05; } /* 任意の倍率 */
+  body { font-size: calc(16px * var(--mobile-font-scale)); }
+
+  .name-input {
+    font-size: 1.05rem;
+    padding: 0.75rem;
+  }
+
+  .check-select, .time-select {
+    font-size: 1.05rem;
+    padding: 0.6rem;
+    min-height: 44px;         /* 指で押しやすいサイズ */
+  }
+
+  .btn, .delete-btn {
+    min-height: 44px;
+    padding: 0.6rem 0.8rem;
+    font-size: 1.05rem;
+  }
+
+  /* テーブル内の select を幅いっぱいに */
+  .cell-wrap .check-select,
+  .cell-wrap .time-select {
+    width: 100%;
+    max-width: none;
+  }
+
+  /* もしカードが横スクロールしてしまう場合の保険 */
+  .person-container { overflow-x: hidden; }
+}
+
+/* --- タブレット〜デスクトップで列数を制限する（任意） --- */
+@media (min-width: 481px) and (max-width: 900px) {
+  .person-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2列までに制限 */
+    gap: 1rem;
+  }
+  .individual { min-width: 0; }
+}
+
+/* --- カードの最小幅を設定して極端な圧縮を防ぐ（全画面） --- */
+.person-container .individual {
+  min-width: 260px; /* これより狭くならないようにする */
+  box-sizing: border-box;
+}
+/* ============================
+   Print styles（最小限）
+   ============================ */
+@media print{
+  body{ background: #fff; color: #000; font-size: 12pt; }
+  header, .btn, .modal{ display: none !important; }
+  .individual{ box-shadow: none; border: 1px solid #000; }
+  .shift-table th, .shift-table td{ border: 1px solid #000; }
+  select{ appearance: none; -webkit-appearance: none; background: transparent; border: 1px solid #000; color: inherit; }
+  .individual{ page-break-inside: avoid; }
 }
 
 /* ============================
-   削除モーダル
-============================ */
-#deleteModal .modal-content {
-    width: 80%;
-    max-width: 350px;
-}
-
-#deleteOkBtn,
-#deleteCancelBtn {
-    padding: 12px 16px;
-    font-size: 18px;
-    border-radius: 8px;
-    min-width: 110px;
-    border: none;
-    cursor: pointer;
-    margin: 5px;
-}
-
-#deleteOkBtn {
-    background: #9e3e3e;
-    color: white;
-}
-
-#deleteCancelBtn {
-    background: #ccc;
-    color: #333;
-}
-
-/* ============================
-   印刷専用CSS
-============================ */
-@media print {
-    * {
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-    }
-
-    #printBtn,
-    #restoreBtn,
-    #themeToggleBtn,
-    .add-btn,
-    .modal {
-        display: none !important;
-    }
-
-    .individual {
-        page-break-inside: avoid;
-    }
-}
-
-/* ============================
-   復元モーダル
-============================ */
-.restore-btn {
-    background: #9e3e3e;
-    color: white;
-    padding: 12px 16px;
-    font-size: 18px;
-    border-radius: 10px;
-    min-width: 140px;
-    margin: 8px;
-    display: inline-block;
-    border: none;
-    cursor: pointer;
-}
-
-.restore-cancel-btn {
-    background: #ccc;
-    color: #333;
-    padding: 12px 16px;
-    font-size: 18px;
-    border-radius: 10px;
-    min-width: 140px;
-    margin-top: 16px;
-    border: none;
-    cursor: pointer;
+   Utility: visually-hidden (if not inlined)
+   ============================ */
+.visually-hidden{
+  position: absolute !important;
+  height: 1px; width: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap;
+  border: 0; padding: 0; margin: -1px;
 }
