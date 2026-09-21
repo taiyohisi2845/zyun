@@ -23,36 +23,35 @@
     </div>
 
     <!-- 最初の1人分 -->
-    <div class="allbox">   
-        <div class="individual">
+    <div class="individual">
+
+
+        <div class="top-row">
+            <input type="text" class="name-input" placeholder="名前">
             <button class="delete-btn">削除</button>
-            <table>
-                <tr>
-                    <td rowspan="2" class="tableline">
-                        <input type="text" class="nameinput" placeholder="名前">
-                    </td>
-                    <td class="tabletext">月</td>
-                    <td class="tabletext">火</td>
-                    <td class="tabletext">水</td>
-                    <td class="tabletext">木</td>
-                    <td class="tabletext">金</td>
-                    <td class="tabletext">土</td>
-                    <td class="tabletext">日</td>
-                </tr>
-
-                <tr>
-                    <td><select class="tablecheck"><option>〇</option><option>✕</option><option>ー</option></select></td>
-                    <td><select class="tablecheck"><option>〇</option><option>✕</option><option>ー</option></select></td>
-                    <td><select class="tablecheck"><option>〇</option><option>✕</option><option>ー</option></select></td>
-                    <td><select class="tablecheck"><option>〇</option><option>✕</option><option>ー</option></select></td>
-                    <td><select class="tablecheck"><option>〇</option><option>✕</option><option>ー</option></select></td>
-                    <td><select class="tablecheck"><option>〇</option><option>✕</option><option>ー</option></select></td>
-                    <td><select class="tablecheck"><option>〇</option><option>✕</option><option>ー</option></select></td>
-                </tr>
-            </table>
         </div>
-    </div>
 
+        <table class="shift-table">
+            <tr>
+                <th>月</th>
+                <th>火</th>
+                <th>水</th>
+                <th>木</th>
+                <th>金</th>
+                <th>土</th>
+                <th>日</th>
+            </tr>
+            <tr>
+                <td><select><option>〇</option><option>✕</option><option>ー</option></select></td>
+                <td><select><option>〇</option><option>✕</option><option>ー</option></select></td>
+                <td><select><option>〇</option><option>✕</option><option>ー</option></select></td>
+                <td><select><option>〇</option><option>✕</option><option>ー</option></select></td>
+                <td><select><option>〇</option><option>✕</option><option>ー</option></select></td>
+                <td><select><option>〇</option><option>✕</option><option>ー</option></select></td>
+                <td><select><option>〇</option><option>✕</option><option>ー</option></select></td>
+            </tr>
+        </table>
+    </div>
     <!-- 追加された人を入れる場所 -->
     <div id="personContainer"></div>
 
