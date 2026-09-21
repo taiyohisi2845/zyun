@@ -1,1 +1,60 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>シフト管理</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <header>
+        <h1>シフト管理</h1>
+        <button id="addPersonBtn" class="add-btn">追加</button>
+    </header>
 
+    <!-- 名前入力ポップアップ -->
+    <div id="nameModal" class="modal">
+        <div class="modal-content">
+            <h3>名前を入力してください</h3>
+            <input type="text" id="modalNameInput" placeholder="名前">
+            <button id="modalOkBtn">OK</button>
+            <button id="modalCancelBtn">キャンセル</button>
+        </div>
+    </div>
+
+    <!-- 最初の1人分 -->
+    <div class="allbox">   
+        <div class="individual">
+            <button class="delete-btn">削除</button>
+            <table>
+                <tr>
+                    <td rowspan="2" class="tableline">
+                        <input type="text" class="nameinput" placeholder="名前">
+                    </td>
+                    <td class="tabletext">月</td>
+                    <td class="tabletext">火</td>
+                    <td class="tabletext">水</td>
+                    <td class="tabletext">木</td>
+                    <td class="tabletext">金</td>
+                    <td class="tabletext">土</td>
+                    <td class="tabletext">日</td>
+                </tr>
+
+                <tr>
+                    <td><select class="tablecheck"><option>〇</option><option>✕</option><option>ー</option></select></td>
+                    <td><select class="tablecheck"><option>〇</option><option>✕</option><option>ー</option></select></td>
+                    <td><select class="tablecheck"><option>〇</option><option>✕</option><option>ー</option></select></td>
+                    <td><select class="tablecheck"><option>〇</option><option>✕</option><option>ー</option></select></td>
+                    <td><select class="tablecheck"><option>〇</option><option>✕</option><option>ー</option></select></td>
+                    <td><select class="tablecheck"><option>〇</option><option>✕</option><option>ー</option></select></td>
+                    <td><select class="tablecheck"><option>〇</option><option>✕</option><option>ー</option></select></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- 追加された人を入れる場所 -->
+    <div id="personContainer"></div>
+
+</body>
+</html>
