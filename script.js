@@ -20,10 +20,8 @@ modalOk.onclick = () => {
 
     const html = `
         <div class="individual">
-
-
             <div class="top-row">
-                <input type="text" class="name-input" placeholder="名前">
+                <input type="text" class="name-input" value="${name}">
                 <button class="delete-btn">削除</button>
             </div>
 
