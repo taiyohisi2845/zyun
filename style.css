@@ -197,46 +197,48 @@ header {
 ============================ */
 @media (max-width: 480px) {
 
-    /* 個別枠の余白調整 */
-    .individual {
-        padding: 12px;
-        margin: 15px;
+    /* 全体の文字を大きく */
+    body {
+        font-size: 20px;
     }
 
-    /* 名前＋削除ボタンをスマホ向けに */
-    .top-row {
-        gap: 6px;
-    }
-
+    /* 名前欄 */
     .name-input {
-        width: 100%;   /* ← スマホでは全幅にする */
-        font-size: 15px;
+        font-size: 20px;
+        padding: 14px;
+        width: 100%;
     }
 
+    /* 削除ボタン */
     .delete-btn {
-        padding: 8px 12px;
-        font-size: 13px;
+        font-size: 18px;
+        padding: 14px 18px;
     }
 
-    /* 曜日とチェックの幅をスマホ向けに縮める */
-    .days span,
+    /* 曜日 */
+    .days span {
+        font-size: 18px;
+        padding: 12px;
+        width: 60px;
+    }
+
+    /* チェックボックス */
     .checks select {
-        width: 45px;   /* ← スマホ用の最適幅 */
-        padding: 6px;
-        font-size: 14px;
+        font-size: 18px;
+        padding: 12px;
+        width: 60px;
     }
 
-    /* gap を少し縮める */
-    .days,
-    .checks {
-        gap: 5px;
+    /* モーダルの文字 */
+    #modalNameInput {
+        font-size: 20px;
+        padding: 16px;
     }
 
-    /* モーダルボタンのサイズ調整 */
     #modalOkBtn,
     #modalCancelBtn {
-        padding: 12px;
-        font-size: 16px;
-        min-width: 100px;
+        font-size: 20px;
+        padding: 16px;
+        min-width: 130px;
     }
 }
