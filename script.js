@@ -55,6 +55,7 @@
     const val = selectEl.value;
     if (val === '〇') selectEl.style.color = 'red';
     else if (val === '✕') selectEl.style.color = '#0088ff';
+    else if (val === '△') selectEl.style.color = '#ff8800';
     else selectEl.style.color = 'black';
   }
 
@@ -82,6 +83,7 @@
                     <option value="ー">ー</option>
                     <option value="〇">〇</option>
                     <option value="✕">✕</option>
+                    <option value="△">△</option>
                   </select>
 
                   <select class="time-select">
