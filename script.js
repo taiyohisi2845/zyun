@@ -20,28 +20,31 @@ modalOk.onclick = () => {
 
     const html = `
         <div class="individual">
-            <button class="delete-btn">削除</button>
-            <table>
+
+
+            <div class="top-row">
+                <input type="text" class="name-input" placeholder="名前">
+                <button class="delete-btn">削除</button>
+            </div>
+
+            <table class="shift-table">
                 <tr>
-                    <td rowspan="2" class="tableline">
-                        <input type="text" class="nameinput" value="${name}">
-                    </td>
-                    <td class="tabletext">月</td>
-                    <td class="tabletext">火</td>
-                    <td class="tabletext">水</td>
-                    <td class="tabletext">木</td>
-                    <td class="tabletext">金</td>
-                    <td class="tabletext">土</td>
-                    <td class="tabletext">日</td>
+                    <th>月</th>
+                    <th>火</th>
+                    <th>水</th>
+                    <th>木</th>
+                    <th>金</th>
+                    <th>土</th>
+                    <th>日</th>
                 </tr>
                 <tr>
-                    <td><select class="tablecheck"><option>〇</option><option>✕</option><option>ー</option></select></td>
-                    <td><select class="tablecheck"><option>〇</option><option>✕</option><option>ー</option></select></td>
-                    <td><select class="tablecheck"><option>〇</option><option>✕</option><option>ー</option></select></td>
-                    <td><select class="tablecheck"><option>〇</option><option>✕</option><option>ー</option></select></td>
-                    <td><select class="tablecheck"><option>〇</option><option>✕</option><option>ー</option></select></td>
-                    <td><select class="tablecheck"><option>〇</option><option>✕</option><option>ー</option></select></td>
-                    <td><select class="tablecheck"><option>〇</option><option>✕</option><option>ー</option></select></td>
+                    <td><select><option class="mitei">ー</option><option class="maru">〇</option><option class="batu">✕</option></select></td>
+                    <td><select><option class="mitei">ー</option><option class="maru">〇</option><option class="batu">✕</option></select></td>
+                    <td><select><option class="mitei">ー</option><option class="maru">〇</option><option class="batu">✕</option></select></td>
+                    <td><select><option class="mitei">ー</option><option class="maru">〇</option><option class="batu">✕</option></select></td>
+                    <td><select><option class="mitei">ー</option><option class="maru">〇</option><option class="batu">✕</option></select></td>
+                    <td><select><option class="mitei">ー</option><option class="maru">〇</option><option class="batu">✕</option></select></td>
+                    <td><select><option class="mitei">ー</option><option class="maru">〇</option><option class="batu">✕</option></select></td>
                 </tr>
             </table>
         </div>
@@ -72,6 +75,19 @@ document.addEventListener("click", (e) => {
 
         if (confirm("削除しますか？")) {
             targetBox.remove();
+        }
+    }
+});
+document.addEventListener("change", function(e) {
+    if (e.target.tagName === "SELECT") {
+        const val = e.target.value;
+
+        if (val === "〇") {
+            e.target.style.color = "red";
+        } else if (val === "✕") {
+            e.target.style.color = "#0088ff";
+        } else if (val === "ー") {
+            e.target.style.color = "black";
         }
     }
 });
