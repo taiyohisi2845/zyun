@@ -357,3 +357,27 @@ select, input[type="text"]{
   white-space: nowrap;
   border: 0; padding: 0; margin: -1px;
 }
+body.is-mobile-view .person-container { display:block !important; }
+body.is-mobile-view .person-container .individual { width:100% !important; }
+/* ============================
+   スマホ強制1列（最優先）
+============================ */
+@media (max-width: 480px) {
+
+  /* グリッドを完全に無効化 */
+  .person-container {
+    display: block !important;
+    grid-template-columns: none !important;
+    width: 100% !important;
+    padding: 0.5rem !important;
+    overflow-x: hidden !important;
+  }
+
+  /* カードを幅いっぱいに */
+  .person-container .individual {
+    width: 100% !important;
+    min-width: 0 !important;   /* ← これが超重要 */
+    margin: 0 0 1rem 0 !important;
+    box-sizing: border-box !important;
+  }
+}
