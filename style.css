@@ -94,55 +94,101 @@ header {
     box-shadow: 0 3px 8px rgba(0,0,0,0.15);
     position: relative;
 }
-.individual table {
-    width: calc(100% - 40px); /* 右側に削除ボタンのスペースを確保 */
+
+/* 名前 + 削除ボタン */
+.top-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
 }
 
-
-/* ============================
-   削除ボタン（縦長）
-============================ */
-.delete-btn {
-    position: absolute;
-    right: -10px;              /* 枠の外に少し出す */
-    top: 50%;
-    transform: translateY(-50%);
-    background: #9e3e3e;
-    color: white;
-    border: none;
-    padding: 20px 10px;        /* 縦長 */
-    font-size: 14px;
-    border-radius: 8px;
-    cursor: pointer;
-    writing-mode: vertical-rl; /* 縦書き */
-    z-index: 10;               /* ★テーブルより前に固定 */
-    margin-right: 9px;
-}
-
-/* ============================
-   テーブル
-============================ */
-.nameinput {
-    width: 90%;
+.name-input {
+    width: 140px;
     padding: 10px;
     font-size: 16px;
     border: 2px solid #9e3e3e;
     border-radius: 6px;
 }
 
-.tabletext {
-    text-align: center;
+/* 削除ボタン（縦長） */
+.delete-btn {
+    background: #9e3e3e;
+    color: white;
+    border: none;
+    padding: 10px 80px;
+    font-size: 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    writing-mode: horizontal-tb; /* ← 横書きに戻す */
+    position: static;            /* ← これで横並びになる */
+    transform: none;
+}
+
+
+/* ============================
+   曜日（表風）
+============================ */
+.days {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.days span {
     padding: 8px;
     background: #f7eaea;
     border: 1px solid #9e3e3e;
+    border-radius: 6px;
     font-weight: bold;
+    text-align: center;
+    display: inline-block;
+    width: 70px;   /* ← 統一幅 */
 }
 
-.tablecheck {
-    width: 100%;
-    padding: 10px;
+/* ============================
+   〇✕ー（表風）
+============================ */
+.checks {
+    display: flex;
+    gap: 8px;
+}
+
+.checks select {
+    padding: 8px;
     font-size: 16px;
     border: 1px solid #9e3e3e;
     border-radius: 6px;
-    background: white;
+    width: 70px;   /* ← 曜日と完全一致 */
+    text-align: center;
+    display: inline-block;
+}
+
+/* ============================
+   table（使う場合）
+============================ */
+.shift-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.shift-table th,
+.shift-table td {
+    width: 70px;
+    text-align: center;
+    padding: 8px;
+    border: 1px solid #9e3e3e;
+}
+
+.shift-table th {
+    background: #f7eaea;
+    font-weight: bold;
+}
+
+.shift-table select {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #9e3e3e;
+    border-radius: 6px;
 }
