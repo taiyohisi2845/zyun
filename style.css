@@ -1,4 +1,33 @@
 /* ============================
+   ベース
+============================ */
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f5f2f2;
+    color: #333;
+}
+
+/* ダークモード */
+body.dark {
+    background: #1e1e1e;
+    color: #eee;
+}
+
+body.dark header {
+    background: #5a1f1f;
+}
+
+body.dark .individual {
+    background: #2a2a2a;
+    border-color: #ffbf00;
+}
+
+body.dark .shift-table th {
+    background: #3a2626;
+}
+
+/* ============================
    ヘッダー
 ============================ */
 header {
@@ -13,35 +42,71 @@ header {
     border-bottom-left-radius: 12px;
     border-bottom-right-radius: 12px;
 }
+
+h1 {
+    margin: 10px 0;
+    font-size: 32px;
+}
+
 .print-btn {
     position: fixed;
     top: 15px;
     left: 15px;
     background: white;
     color: #9e3e3e;
-    border: 6px solid #ffbf00;
-    padding: 10px 20px;
-    font-size: 40px;
+    border: 3px solid #ffbf00;
+    padding: 8px 16px;
+    font-size: 20px;
     border-radius: 12px;
     cursor: pointer;
     z-index: 50;
     box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 
+.print-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+}
 
+.print-btn:active {
+    transform: scale(0.96);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.restore-btn-header {
+    top: 70px;
+}
+
+.theme-btn {
+    left: auto;
+    right: 15px;
+}
+
+/* 追加ボタン */
 .add-btn {
     position: fixed;
-    top: 15px;
+    top: 80px;
     right: 15px;
-    background: white;
+    background: #ffbf00;
     color: #9e3e3e;
-    border: 6px solid #ffbf00;
+    border: none;
     padding: 10px 16px;
-    font-size: 90px;
+    font-size: 40px;
     border-radius: 50%;
     cursor: pointer;
     z-index: 50;
     box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.add-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+}
+
+.add-btn:active {
+    transform: scale(0.95);
 }
 
 /* ============================
@@ -79,40 +144,63 @@ header {
     box-sizing: border-box;
 }
 
+#modalOkBtn,
+#modalCancelBtn {
+    padding: 12px 16px;
+    font-size: 18px;
+    border-radius: 8px;
+    min-width: 110px;
+    border: none;
+    cursor: pointer;
+    margin: 5px;
+}
+
 #modalOkBtn {
     background: #9e3e3e;
     color: white;
-    padding: 15px;
-    font-size: 20px;
-    border-radius: 8px;
-    display: inline-block;
-    min-width: 120px;
-    margin-right: 10px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
 }
 
 #modalCancelBtn {
     background: #ccc;
     color: #333;
-    padding: 15px;
-    font-size: 16px;
-    border-radius: 8px;
-    display: inline-block;
-    min-width: 100px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
 }
 
 /* ============================
    個別枠
 ============================ */
+#personContainer {
+    padding: 10px;
+}
+
 .individual {
     background: white;
     border: 2px solid #9e3e3e;
     border-radius: 14px;
     padding: 15px;
-    margin: 20px;
+    margin: 20px 10px;
     box-shadow: 0 6px 18px rgba(0,0,0,0.12);
     position: relative;
+    animation: fadeIn 0.25s ease;
+}
+
+/* 削除時フェードアウト */
+.individual.fade-out {
+    animation: fadeOut 0.2s ease forwards;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; transform: translateY(0); }
+    to   { opacity: 0; transform: translateY(8px); }
 }
 
 /* 名前 + 削除ボタン */
@@ -120,6 +208,7 @@ header {
     display: flex;
     align-items: center;
     gap: 10px;
+    margin-bottom: 10px;
 }
 
 .name-input {
@@ -130,7 +219,7 @@ header {
     border-radius: 10px;
 }
 
-/* 削除ボタン（縦長） */
+/* 削除ボタン */
 .delete-btn {
     flex: 2;
     background: #9e3e3e;
@@ -143,47 +232,8 @@ header {
     box-shadow: 0 3px 8px rgba(0,0,0,0.15);
 }
 
-
 /* ============================
-   曜日（表風）
-============================ */
-.days {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 10px;
-}
-
-.days span {
-    padding: 8px;
-    background: #f7eaea;
-    border: 1px solid #9e3e3e;
-    border-radius: 8px;
-    font-weight: bold;
-    text-align: center;
-    display: inline-block;
-    width: 70px;   /* ← 統一幅 */
-}
-
-/* ============================
-   〇✕ー（表風）
-============================ */
-.checks {
-    display: flex;
-    gap: 8px;
-}
-
-.checks select {
-    padding: 8px;
-    font-size: 16px;
-    border: 1px solid #9e3e3e;
-    border-radius: 6px;
-    width: 70px;   /* ← 曜日と完全一致 */
-    text-align: center;
-    display: inline-block;
-}
-
-/* ============================
-   table（使う場合）
+   table
 ============================ */
 .shift-table {
     width: 100%;
@@ -205,192 +255,131 @@ header {
     border-radius: 6px;
 }
 
+/* セル内ラップ */
+.cell-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+}
+
+/* 〇✕ー select */
 .shift-table select {
     width: 100%;
     padding: 6px;
     border: 1px solid #9e3e3e;
     border-radius: 10px;
-    font-size: 60px;
+    font-size: 16px;
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
     color: inherit;
     background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
     background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 20px;
-    padding-right: 40px; /* 矢印分の余白 */
-}
-
-.maru { color: red; }
-.batu { color: #0088ff; }
-.mitei { color: black; }
-
-/* ============================
-   スマホ版（幅480px以下）
-============================ */
-@media (max-width: 10000px) {
-
-    /* 全体の文字を大きく */
-    body {
-        font-size: 40px;
-    }
-
-    /* 名前欄 */
-    .name-input {
-        font-size: 40px;
-        padding: 14px;
-        width: 100%;
-    }
-
-    /* 削除ボタン */
-    .delete-btn {
-        font-size: 36px;
-        padding: 14px 18px;
-    }
-
-    /* 曜日 */
-    .days span {
-        font-size: 36px;
-        padding: 12px;
-        width: 60px;
-    }
-
-    /* チェックボックス */
-    .checks select {
-        font-size: 36px;
-        padding: 12px;
-        width: 60px;
-    }
-
-    /* モーダルの文字 */
-    #modalNameInput {
-        font-size: 40px;
-        padding: 16px;
-    }
-
-    #modalOkBtn,
-    #modalCancelBtn {
-        font-size: 40px;
-        padding: 16px;
-        min-width: 130px;
-    }
+    background-position: right 6px center;
+    background-size: 16px;
+    padding-right: 26px;
 }
 
 .time-select {
-    padding: 4px !important;
-    font-size: 35px !important;
+    padding: 4px;
+    font-size: 14px;
     border: 1px solid #9e3e3e;
     border-radius: 6px;
     width: 100%;
     box-sizing: border-box;
 }
-/* 削除モーダル（追加モーダルと同じデザイン） */
+
+/* 時間無効化 */
+.time-disabled {
+    opacity: 0.4;
+}
+
+/* 〇✕色 */
+.maru { color: red; }
+.batu { color: #0088ff; }
+.mitei { color: black; }
+
+/* 区切り */
+.tilde {
+    font-size: 14px;
+}
+
+/* ============================
+   削除モーダル
+============================ */
 #deleteModal .modal-content {
-    background: white;
     width: 80%;
     max-width: 350px;
-    margin: 150px auto;
-    padding: 20px;
-    border-radius: 14px;
-    text-align: center;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+}
+
+#deleteOkBtn,
+#deleteCancelBtn {
+    padding: 12px 16px;
+    font-size: 18px;
+    border-radius: 8px;
+    min-width: 110px;
+    border: none;
+    cursor: pointer;
+    margin: 5px;
 }
 
 #deleteOkBtn {
     background: #9e3e3e;
     color: white;
-    padding: 15px;
-    font-size: 20px;
-    border-radius: 8px;
-    min-width: 120px;
-    margin-right: 10px;
 }
 
 #deleteCancelBtn {
     background: #ccc;
     color: #333;
-    padding: 15px;
-    font-size: 20px;
-    border-radius: 8px;
-    min-width: 120px;
 }
+
 /* ============================
    印刷専用CSS
 ============================ */
 @media print {
-
-    /* 背景を白に統一 */
-    body {
-        background: white !important;
-        font-size: 16px !important; /* スマホ版の巨大化を無効化 */
-    }
-    #printBtn {
-        display: none !important;
-    }
     * {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
 
-    /* 画面専用のボタン類を非表示 */
+    #printBtn,
+    #restoreBtn,
+    #themeToggleBtn,
     .add-btn,
-    .delete-btn,
-    #modalOkBtn,
-    #modalCancelBtn,
-    #deleteOkBtn,
-    #deleteCancelBtn,
-    #deleteModal,
-    #modalNameInput,
-    #modalCancelBtn,
-    #modalOkBtn {
-        display: none !important;
-    }
-
-    /* モーダル全体を非表示 */
     .modal {
         display: none !important;
     }
 
-    /* 印刷時は枠を濃くする */
-    .individual {
-        box-shadow: none !important;
-        border: 2px solid #000 !important;
-    }
-
-    /* 曜日・セルの枠を濃くする */
-    .shift-table th,
-    .shift-table td {
-        border: 1px solid #000 !important;
-    }
-
-    /* select を印刷用に変換（矢印を消す） */
-    select {
-        color: inherit !important;
-        background: white !important;
-        appearance: none !important;
-        -webkit-appearance: none !important;
-        background-image: none !important;
-        padding-right: 0 !important;
-        font-size: 16px !important;
-        border: 1px solid #000 !important;
-    }
-
-    /* 時間の select を紙用に最適化 */
-    .time-select {
-        font-size: 14px !important;
-        padding: 4px !important;
-        border-radius: 4px !important;
-    }
-
-    /* 〇✕の select も紙用に */
-    .checks select {
-        font-size: 16px !important;
-        padding: 4px !important;
-    }
-
-    /* 印刷時はページ区切りを自動調整 */
     .individual {
         page-break-inside: avoid;
     }
+}
+
+/* ============================
+   復元モーダル
+============================ */
+.restore-btn {
+    background: #9e3e3e;
+    color: white;
+    padding: 12px 16px;
+    font-size: 18px;
+    border-radius: 10px;
+    min-width: 140px;
+    margin: 8px;
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+}
+
+.restore-cancel-btn {
+    background: #ccc;
+    color: #333;
+    padding: 12px 16px;
+    font-size: 18px;
+    border-radius: 10px;
+    min-width: 140px;
+    margin-top: 16px;
+    border: none;
+    cursor: pointer;
 }
